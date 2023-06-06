@@ -1,4 +1,5 @@
 ; hello.asm
+BITS 64;
 section .data					
     msg	db      "hello, world",0			
 section .bss							
