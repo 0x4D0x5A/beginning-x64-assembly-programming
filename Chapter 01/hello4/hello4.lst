@@ -1,0 +1,26 @@
+     1                                  ; hello4.asm
+     2                                  BITS 64;
+     3                                  extern  printf  ; declare the function as external
+     4                                  section .data
+     5 00000000 48656C6C6F2C20576F-         msg     db  "Hello, World!",0
+     5 00000009 726C642100         
+     6 0000000E 54686973206973206F-         fmtstr  db  "This is our string: %s",10,0 ;printformat
+     6 00000017 757220737472696E67-
+     6 00000020 3A2025730A00       
+     7                                  section .bss
+     8                                  section .text
+     9                                      global main
+    10                                  main:
+    11 00000000 55                          push    rbp
+    12 00000001 4889E5                      mov     rbp,rsp
+    13 00000004 48BF-                       mov     rdi, fmtstr   ; first argument for printf
+    13 00000006 [0E00000000000000] 
+    14 0000000E 48BE-                       mov     rsi, msg      ; second argument for printf
+    14 00000010 [0000000000000000] 
+    15 00000018 B800000000                  mov     rax, 0        ; no xmm registers involved
+    16 0000001D E8(00000000)                call    printf        ; call the function
+    17 00000022 4889EC                      mov     rsp,rbp
+    18 00000025 5D                          pop     rbp
+    19 00000026 B83C000000                  mov     rax, 60       ; 60 = exit
+    20 0000002B BF00000000                  mov     rdi, 0        ; 0 = success exit code
+    21 00000030 0F05                        syscall               ; quit
