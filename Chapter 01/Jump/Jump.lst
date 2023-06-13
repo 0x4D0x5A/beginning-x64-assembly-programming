@@ -1,0 +1,37 @@
+     1                                  ; jump.asm
+     2                                  BITS 64;
+     3                                  extern printf
+     4                                  section .data
+     5 00000000 2A00000000000000            number1     dq      42     
+     6 00000008 2900000000000000            number2     dq      41
+     7 00000010 4E554D42455231203E-         fmt1        db      "NUMBER1 > = NUMBER2",10,0
+     7 00000019 203D204E554D424552-
+     7 00000022 320A00             
+     8 00000025 4E554D42455231203C-         fmt2        db      "NUMBER1 < NUMBER2",10,0
+     8 0000002E 204E554D424552320A-
+     8 00000037 00                 
+     9                                  
+    10                                  section .bss
+    11                                  section .text
+    12                                      global      main
+    13                                  main:
+    14 00000000 55                          push    rbp
+    15 00000001 4889E5                      mov     rbp,rsp
+    16 00000004 488B0425[00000000]          mov     rax, [number1]  ; move the numbers into registers
+    17 0000000C 488B1C25[08000000]          mov     rbx, [number2]
+    18 00000014 4839D8                      cmp     rax,rbx     ; compare rax and rbx
+    19 00000017 7D16                        jge     greater     ; rax greater or equal go   to greater:
+    20 00000019 48BF-                       mov     rdi,fmt2    ; rax is smaller, continue  here
+    20 0000001B [2500000000000000] 
+    21 00000023 B800000000                  mov     rax,0       ; no xmm involved
+    22 00000028 E8(00000000)                call    printf      ; display fmt2
+    23 0000002D EB14                        jmp     exit        ; jump to label exit:
+    24                                  greater:
+    25 0000002F 48BF-                       mov     rdi,fmt1    ; rax is greater
+    25 00000031 [1000000000000000] 
+    26 00000039 B800000000                  mov     rax,0       ; no xmm involved
+    27 0000003E E8(00000000)                call    printf      ; display fmt1
+    28                                  exit:
+    29 00000043 4889EC                      mov     rsp,rbp
+    30 00000046 5D                          pop     rbp
+    31 00000047 C3                          ret
