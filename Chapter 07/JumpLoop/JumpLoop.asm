@@ -2,7 +2,7 @@
 BITS 64;
 extern printf
 section .data
-    number  dq      5
+    number  dq      1000000000
     fmt     db      "The sum from 0 to %ld is %ld",10,0
 
 section .bss
