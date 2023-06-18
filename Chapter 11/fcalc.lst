@@ -1,0 +1,118 @@
+     1                                  ; fcalc.asm
+     2                                  BITS 64:
+     3                                  extern printf
+     4                                  section .data							
+     5 00000000 0000000000002240        	number1	dq	9.0					
+     6 00000008 0000000000405240        	number2	dq	73.0
+     7 00000010 546865206E756D6265-     	fmt	db	"The numbers are %f and %f",10,0					
+     7 00000019 727320617265202566-
+     7 00000022 20616E642025660A00 
+     8 0000002B 25732025660A00          	fmtfloat	db	"%s %f",10,0 
+     9 00000032 54686520666C6F6174-     	f_sum	db	"The float sum of %f and %f is %f",10,0
+     9 0000003B 2073756D206F662025-
+     9 00000044 6620616E6420256620-
+     9 0000004D 69732025660A00     
+    10 00000054 54686520666C6F6174-     	f_dif	db	"The float difference of %f and %f is %f",10,0
+    10 0000005D 20646966666572656E-
+    10 00000066 6365206F6620256620-
+    10 0000006F 616E64202566206973-
+    10 00000078 2025660A00         
+    11 0000007D 54686520666C6F6174-     	f_mul	db	"The float product of %f and %f is %f",10,0
+    11 00000086 2070726F6475637420-
+    11 0000008F 6F6620256620616E64-
+    11 00000098 202566206973202566-
+    11 000000A1 0A00               
+    12 000000A3 54686520666C6F6174-     	f_div	db	"The float division of %f by %f is %f",10,0
+    12 000000AC 206469766973696F6E-
+    12 000000B5 206F66202566206279-
+    12 000000BE 202566206973202566-
+    12 000000C7 0A00               
+    13 000000C9 54686520666C6F6174-             f_sqrt	db	"The float squareroot of %f is %f",10,0
+    13 000000D2 20737175617265726F-
+    13 000000DB 6F74206F6620256620-
+    13 000000E4 69732025660A00     
+    14                                  section .bss
+    15                                  section .text							
+    16                                  	global main					
+    17                                  main:
+    18 00000000 55                          push	rbp		; necessary because of printf with float
+    19 00000001 4889E5                      mov     rbp,rsp
+    20                                  ; print the numbers
+    21 00000004 F20F100425-             	movsd xmm0, [number1]
+    21 00000009 [00000000]         
+    22 0000000D F20F100C25-             	movsd xmm1, [number2]
+    22 00000012 [08000000]         
+    23 00000016 48BF-                   	mov	rdi,fmt
+    23 00000018 [1000000000000000] 
+    24 00000020 B802000000              	mov	rax,2	; two floats
+    25 00000025 E8(00000000)            	call 	printf
+    26                                  ; sum	
+    27 0000002A F20F101425-                 movsd xmm2, [number1]	; double precision float into xmm
+    27 0000002F [00000000]         
+    28 00000033 F20F581425-                 addsd xmm2, [number2]	; add into to xmm
+    28 00000038 [08000000]         
+    29                                  		; print the result
+    30 0000003C F20F100425-             		movsd xmm0, [number1]
+    30 00000041 [00000000]         
+    31 00000045 F20F100C25-             		movsd xmm1, [number2]
+    31 0000004A [08000000]         
+    32 0000004E 48BF-                   		mov	rdi,f_sum
+    32 00000050 [3200000000000000] 
+    33 00000058 B803000000              		mov	rax,3	; one float
+    34 0000005D E8(00000000)            		call 	printf
+    35                                  ; difference    
+    36 00000062 F20F101425-                 movsd xmm2, [number1]	; double precision float into xmm
+    36 00000067 [00000000]         
+    37 0000006B F20F5C1425-                 subsd xmm2, [number2]	; subtract from xmm
+    37 00000070 [08000000]         
+    38                                  		; print the result
+    39 00000074 F20F100425-             		movsd xmm0, [number1]
+    39 00000079 [00000000]         
+    40 0000007D F20F100C25-             		movsd xmm1, [number2]
+    40 00000082 [08000000]         
+    41 00000086 48BF-                               	mov	rdi,f_dif
+    41 00000088 [5400000000000000] 
+    42 00000090 B803000000              		mov	rax,3	; three floats
+    43 00000095 E8(00000000)            		call 	printf
+    44                                  ; multiplication  
+    45 0000009A F20F101425-                 movsd xmm2, [number1]	; double precision float into xmm
+    45 0000009F [00000000]         
+    46 000000A3 F20F591425-                 mulsd xmm2, [number2]	; multiply with xmm 
+    46 000000A8 [08000000]         
+    47                                  		; print the result
+    48 000000AC 48BF-                               	mov	rdi,f_mul
+    48 000000AE [7D00000000000000] 
+    49 000000B6 F20F100425-                         	movsd xmm0, [number1]
+    49 000000BB [00000000]         
+    50 000000BF F20F100C25-             		movsd xmm1, [number2]
+    50 000000C4 [08000000]         
+    51 000000C8 B803000000              		mov	rax,3	; three floats
+    52 000000CD E8(00000000)            		call 	printf
+    53                                  ; division
+    54 000000D2 F20F101425-                 movsd xmm2, [number1]	; double precision float into xmm
+    54 000000D7 [00000000]         
+    55 000000DB F20F5E1425-                 divsd xmm2, [number2]	; divide xmm0 
+    55 000000E0 [08000000]         
+    56                                  		; print the result
+    57 000000E4 48BF-                               	mov	rdi,f_div
+    57 000000E6 [A300000000000000] 
+    58 000000EE F20F100425-                         	movsd xmm0, [number1]
+    58 000000F3 [00000000]         
+    59 000000F7 F20F100C25-             		movsd xmm1, [number2]
+    59 000000FC [08000000]         
+    60 00000100 B801000000              		mov	rax,1	; one float
+    61 00000105 E8(00000000)            		call 	printf
+    62                                  ; squareroot
+    63 0000010A F20F510C25-                sqrtsd xmm1, [number1]	; squareroot double precision float in xmm
+    63 0000010F [00000000]         
+    64                                  		; print the result
+    65 00000113 48BF-                               	mov	rdi,f_sqrt
+    65 00000115 [C900000000000000] 
+    66 0000011D F20F100425-                         	movsd xmm0, [number1]
+    66 00000122 [00000000]         
+    67 00000126 B802000000              		mov	rax,2	; one float
+    68 0000012B E8(00000000)            		call 	printf
+    69                                  ; exit
+    70 00000130 4889EC                      mov rsp,rbp              
+    71 00000133 5D                          pop	rbp		; undo the push at the beginning
+    72 00000134 C3                          ret

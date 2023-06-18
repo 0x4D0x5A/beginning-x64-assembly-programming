@@ -1,4 +1,5 @@
 ; fcalc.asm
+BITS 64:
 extern printf
 section .data							
 	number1	dq	9.0					
