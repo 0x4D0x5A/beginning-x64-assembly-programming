@@ -1,4 +1,5 @@
 ; function4.asm
+BITS 64:
 extern printf
 extern c_area
 extern c_circum

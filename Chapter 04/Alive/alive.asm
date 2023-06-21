@@ -13,8 +13,8 @@ section .text
 
     global main
 main:
-    push    rbp         ; function prologue
-    mov     rbp,rsp     ; function prologue
+    ;push    rbp         ; function prologue
+    ;mov     rbp,rsp     ; function prologue
     mov     rax, 1      ; 1 = write
     mov     rdi, 1      ; 1 = to stdout
     mov     rsi, msg1   ; string to display
