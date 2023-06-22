@@ -1,4 +1,5 @@
 ; function5.asm
+BITS 64:
 extern printf
 section .data				
 	first	db	"A",0					
@@ -36,6 +37,7 @@ main:
  	push seventh
 	push sixth
 	mov rax, 0
+	push 0x0		; i did this for stack alignment. Program crashed without it
 	call printf
     and rsp , 0xfffffffffffffff0 ; 16 byte align the stack
 

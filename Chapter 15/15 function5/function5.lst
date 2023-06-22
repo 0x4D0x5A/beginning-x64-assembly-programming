@@ -1,0 +1,61 @@
+     1                                  ; function5.asm
+     2                                  BITS 64:
+     3                                  extern printf
+     4                                  section .data				
+     5 00000000 4100                    	first	db	"A",0					
+     6 00000002 4200                    	second	db	"B",0
+     7 00000004 4300                    	third	db	"C",0
+     8 00000006 4400                    	fourth	db	"D",0			
+     9 00000008 4500                    	fifth	db	"E",0
+    10 0000000A 4600                      	sixth	db	"F",0
+    11 0000000C 4700                    	seventh	db	"G",0
+    12 0000000E 4800                       	eighth  db      "H",0
+    13 00000010 4900                       	ninth   db      "I",0
+    14 00000012 4A00                       	tenth   db      "J",0
+    15 00000014 54686520737472696E-      	fmt1	db	"The string is: %s%s%s%s%s%s%s%s%s%s",10,0 
+    15 0000001D 672069733A20257325-
+    15 00000026 732573257325732573-
+    15 0000002F 25732573257325730A-
+    15 00000038 00                 
+    16 00000039 5049203D2025660A00        	fmt2    db	"PI = %f",10,0
+    17 00000042 1F85EB51B81E0940           	pi   dq      3.14
+    18                                  
+    19                                  section .bss													
+    20                                  section .text									
+    21                                  	global main						
+    22                                  main:
+    23 00000000 4889E5                      mov rbp, rsp; for correct debugging
+    24 00000003 55                          push rbp
+    25 00000004 4889E5                      mov rbp,rsp
+    26                                  
+    27 00000007 48BF-                   	mov rdi,fmt1	
+    27 00000009 [1400000000000000] 
+    28 00000011 48BE-                   	mov rsi, first		; the correct registers
+    28 00000013 [0000000000000000] 
+    29 0000001B 48BA-                   	mov rdx, second
+    29 0000001D [0200000000000000] 
+    30 00000025 48B9-                   	mov rcx, third			
+    30 00000027 [0400000000000000] 
+    31 0000002F 49B8-                   	mov r8, fourth
+    31 00000031 [0600000000000000] 
+    32 00000039 49B9-                     	mov r9, fifth
+    32 0000003B [0800000000000000] 
+    33                                  
+    34 00000043 68[12000000]              	push tenth		; now start pushing in
+    35 00000048 68[10000000]               	push ninth		; reverse order
+    36 0000004D 68[0E000000]              	push eighth
+    37 00000052 68[0C000000]             	push seventh
+    38 00000057 68[0A000000]            	push sixth
+    39 0000005C B800000000              	mov rax, 0
+    40 00000061 6A00                    	push 0x0
+    41 00000063 E8(00000000)            	call printf
+    42 00000068 4883E4F0                    and rsp , 0xfffffffffffffff0 ; 16 byte align the stack
+    43                                  
+    44 0000006C F20F100425-               	movsd xmm0,[pi] ; print a float
+    44 00000071 [42000000]         
+    45 00000075 B801000000                	mov rax, 1
+    46 0000007A 48BF-                     	mov rdi, fmt2
+    46 0000007C [3900000000000000] 
+    47 00000084 E8(00000000)              	call printf
+    48 00000089 C9                      leave
+    49 0000008A C3                      ret
