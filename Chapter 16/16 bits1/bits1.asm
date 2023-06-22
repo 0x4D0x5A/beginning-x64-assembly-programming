@@ -1,4 +1,5 @@
 ; bits1.asm
+BITS 64:
 extern printb  
 extern printf
 section .data
@@ -22,130 +23,131 @@ section .bss
 section .text							
 	global main						
 main:
-    mov rbp, rsp; for correct debugging
-    push rbp
-    mov rbp,rsp
+    mov 	rbp, rsp	; for correct debugging
+    push 	rbp
+	push	0x0			; for stack alignment
+    mov 	rbp,rsp
 ; print number1
-mov     rsi, msgn1				
-call printmsg	
-    	mov rdi, [number1]
-	call printb
+	mov     rsi, msgn1				
+	call 	printmsg	
+    mov 	rdi, [number1]
+	call 	printb
 ; print number2
-mov     rsi, msgn2				
-call printmsg
-	mov rdi, [number2]
-        call printb
+	mov     rsi, msgn2				
+	call 	printmsg
+	mov 	rdi, [number2]
+    call 	printb
 
 ; print XOR (exclusive OR)------------------------       
-mov     rsi, msg1				
-call printmsg			
+	mov     rsi, msg1				
+	call 	printmsg			
 ; xor and print
-        mov rax,[number1]
-        xor rax,[number2]
-        mov rdi, rax
-	call printb
+    mov 	rax,[number1]
+    xor 	rax,[number2]
+    mov 	rdi, rax
+	call 	printb
 
 ; print OR ---------------------------------------             
-mov     rsi, msg2				
-call printmsg
+	mov 	rsi, msg2				
+	call 	printmsg
 ; or and print
-        mov rax,[number1]
-        or rax,[number2]
-        mov rdi, rax
-	call printb
+    mov 	rax,[number1]
+    or 		rax,[number2]
+    mov 	rdi, rax
+	call 	printb
 
 ; print AND  ---------------------------------------              
-mov     rsi, msg3				
-call printmsg			
+	mov     rsi, msg3				
+	call 	printmsg			
 ; and and print
-        mov rax,[number1]
-        and rax,[number2]
-        mov rdi, rax
-	call printb
+    mov 	rax,[number1]
+    and 	rax,[number2]
+    mov 	rdi, rax
+	call 	printb
 
 ; print NOT  ---------------------------------------              
-mov     rsi, msg4				
-call printmsg			
+	mov     rsi, msg4				
+	call 	printmsg			
 ; not and print
-	mov rax,[number1]
-	not rax
-	mov rdi, rax
-	call printb
+	mov 	rax,[number1]
+	not 	rax
+	mov 	rdi, rax
+	call 	printb
 
 ; print SHL  (shift left----------------------------              
-mov     rsi, msg5				
-call printmsg			
+	mov     rsi, msg5				
+	call 	printmsg			
 ; shl and print
-	mov rax,[number1]
-	shl al,2
- 	mov rdi, rax
-	call printb
+	mov 	rax,[number1]
+	shl 	al,2
+ 	mov 	rdi, rax
+	call 	printb
 
 ; print SHR  (shift right)--------------------------              
-mov     rsi, msg6				
-call printmsg			
+	mov     rsi, msg6				
+	call 	printmsg			
 ;shr and print
-	mov rax,[number1]
-	shr al,2
- 	mov rdi, rax
-	call printb
+	mov 	rax,[number1]
+	shr 	al,2
+ 	mov 	rdi, rax
+	call 	printb
 
 ; print SAL  (shift arithmetic left)----------------              
-mov     rsi, msg7				
-call printmsg			
+	mov     rsi, msg7				
+	call 	printmsg			
 ; sal and print
-	mov rax,[number1]
-	sal al,2
-  	mov rdi, rax
-	call printb
+	mov 	rax,[number1]
+	sal 	al,2
+  	mov 	rdi, rax
+	call 	printb
 
 ; print SAR  (shift arithmetic right)----------------              
-mov     rsi, msg8				
-call printmsg			
+	mov     rsi, msg8				
+	call 	printmsg			
 ; sar and print
- 	mov rax,[number1]
-	sar al,2
-  	mov rdi, rax
-	call printb
+ 	mov 	rax,[number1]
+	sar 	al,2
+  	mov 	rdi, rax
+	call 	printb
 
 ; print ROL  (rotate left)---------------------------              
-mov     rsi, msg9				
-call printmsg			
+	mov     rsi, msg9				
+	call 	printmsg			
 ; rol and print
-  	mov rax,[number1]
-	rol al,2
-   	mov rdi, rax
-	call printb
-mov     rsi, msg10				
-call printmsg	
- 	mov rax,[number2]
-	rol al,2
- 	mov rdi, rax
-	call printb
+  	mov 	rax,[number1]
+	rol 	al,2
+   	mov 	rdi, rax
+	call 	printb
+	mov     rsi, msg10				
+	call 	printmsg	
+ 	mov 	rax,[number2]
+	rol 	al,2
+ 	mov 	rdi, rax
+	call	printb
 ; print ROR  (rotate right)---------------------------              
-mov     rsi, msg11				
-call printmsg			
+	mov     rsi, msg11				
+	call 	printmsg			
 ; ror and print
- 	mov rax,[number1]
-	ror al,2
-  	mov rdi, rax
-	call printb
-mov     rsi, msg12				
-call printmsg	
-  	mov rax,[number2]
-	ror al,2
-  	mov rdi, rax
-	call printb
-leave
-ret		
+ 	mov 	rax,[number1]
+	ror 	al,2
+  	mov 	rdi, rax
+	call 	printb
+	mov     rsi, msg12				
+	call 	printmsg	
+  	mov 	rax,[number2]
+	ror 	al,2
+  	mov 	rdi, rax
+	call 	printb
+	leave
+	ret		
 
 
 printmsg:	; print the heading for every bit operation
 	section .data
 	       	.fmtstr	db	"%s",0
 	section .text
-		mov	rdi,.fmtstr
-		mov	rax,0
+		mov		rdi,.fmtstr
+		mov		rax,0
 		call 	printf
-	ret
+		ret
 								
