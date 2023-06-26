@@ -1,4 +1,5 @@
 ; alive2.asm
+BITS 64:
 section .data	
 	msg1	db	"Hello, World!",0	
 	msg2	db	"Alive and Kicking!",0	
