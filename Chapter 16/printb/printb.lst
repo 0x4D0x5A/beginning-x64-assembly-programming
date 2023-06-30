@@ -1,0 +1,89 @@
+     1                                  ; printb.asm
+     2                                  BITS 64:
+     3                                  extern printf
+     4                                  section .data				
+     5 00000000 B8FFFFFFFFFFFFFF            number1	dq	-72
+     6                                  section .bss													
+     7                                  section .text									
+     8                                  	global main						
+     9                                  main:
+    10 00000000 55                          push rbp
+    11 00000001 4889E5                      mov rbp,rsp
+    12 00000004 488B3C25[00000000]          mov rdi, [number1]
+    13 0000000C E802000000                  call printb
+    14 00000011 C9                          leave
+    15 00000012 C3                          ret
+    16                                  
+    17                                  printb:
+    18                                  section .data
+    19 00000008 200A00                      strspace    db " ",10,0
+    20 0000000B 3F                          strLen      db  63
+    21 0000000C 31                          str1        db "1"
+    22 0000000D 30                          str0        db "0"
+    23 0000000E 25730A00                    fmtstr      db "%s",10,0
+    24 00000012 00                          shiftAmount db 0
+    25                                  section .bss
+    26                                  section .text
+    27 00000013 55                          push    rbp
+    28 00000014 4889E5                    	mov     rbp,rsp
+    29                                      
+    30 00000017 48B9-                       mov     rcx, strLen
+    30 00000019 [0B00000000000000] 
+    31 00000021 41BC00000000                mov     r12, 0
+    32                                  
+    33                                  Initialloop:
+    34                                      ; check if eighth bit, if yes, print space
+    35 00000027 4831C0                      xor     rax,rax           ; clear rax (especially higher bits)
+    36 0000002A 31D2                        xor     edx, edx
+    37 0000002C 66B80800                    mov     ax, 8
+    38 00000030 4489E3                      mov     ebx, r12d
+    39 00000033 FFC3                        inc     ebx
+    40 00000035 F7FB                        idiv    ebx     ; ????? lower 4 btyes
+    41 00000037 83FA00                      cmp     edx, 0x0 ; remainder in ah (rdx?)
+    42 0000003A 752E                        jne     Printloop
+    43 0000003C 57                          push    rdi
+    44 0000003D 48BF-                       mov	    rdi, fmtstr
+    44 0000003F [0E00000000000000] 
+    45 00000047 48BE-                       mov     rsi, strspace
+    45 00000049 [0800000000000000] 
+    46 00000051 B800000000              	mov	    rax,0		; no floating point
+    47 00000056 E8(00000000)            	call    printf
+    48 0000005B 5F                          pop     rdi
+    49 0000005C 4981FC[0B000000]            cmp     r12, strLen
+    50 00000063 7457                        jz      exit
+    51 00000065 49FFC4                      inc     r12
+    52 00000068 EBBD                        jmp     Initialloop
+    53                                  
+    54                                  Printloop:
+    55                                      ; check if bit equals 1, then print 1 else print 0
+    56                                      ; test ah, 1<<1
+    57 0000006A 48D1EB                      shr     rbx, 1
+    58 0000006D 7325                        jnc     write1  ;jump no carry (means the bit is zero)
+    59 0000006F 57                          push    rdi
+    60 00000070 48BF-                       mov		rdi, fmtstr
+    60 00000072 [0E00000000000000] 
+    61 0000007A 48BE-                       mov    	rsi, str0
+    61 0000007C [0D00000000000000] 
+    62 00000084 B800000000                  mov		rax, 0		
+    63 00000089 E8(00000000)                call  	printf
+    64 0000008E 5F                          pop     rdi
+    65 0000008F 49FFC4                      inc     r12
+    66 00000092 EB93                        jmp     Initialloop
+    67                                  
+    68                                  write1:
+    69 00000094 57                          push    rdi
+    70 00000095 48BF-                       mov		rdi, fmtstr
+    70 00000097 [0E00000000000000] 
+    71 0000009F 48BE-                       mov    	rsi, str1
+    71 000000A1 [0C00000000000000] 
+    72 000000A9 B800000000                  mov		rax, 0		
+    73 000000AE E8(00000000)                call  	printf
+    74 000000B3 5F                          pop     rdi
+    75 000000B4 49FFC4                      inc     r12
+    76 000000B7 E96BFFFFFF                  jmp     Initialloop
+    77                                  
+    78                                  exit:
+    79 000000BC 4889EC                      mov 	rsp,rbp
+    80 000000BF 5D                          pop 	rbp
+    81 000000C0 C3                          ret
+    82                                  
