@@ -26,7 +26,6 @@ section .text
     push    rbp
     mov     rbp,rsp
     
-    mov     rcx, strLen
     mov     r12, 0
 
 Initialloop:
@@ -45,10 +44,10 @@ Initialloop:
     mov	    rdi, fmtstr
     mov     rsi, strspace
     mov	    rax,0       ; no floating point
-    call    printf
+    call    printf      ; crashes when r12 reaches 7?
     add     rsp,8       ; skip the 0x0 that was pushed to the stack prior to function call
     pop     rdi
-    cmp     r12, strLen
+    cmp     r12, strLen ; TODO; I dont think this works?
     jz      exit
     inc     r12
     jmp     Initialloop
