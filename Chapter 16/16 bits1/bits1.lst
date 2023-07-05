@@ -50,9 +50,9 @@
     23                                  section .text							
     24                                  	global main						
     25                                  main:
-    26 00000000 4889E5                      mov 	rbp, rsp; for correct debugging
+    26 00000000 4889E5                      mov 	rbp, rsp	; for correct debugging
     27 00000003 55                          push 	rbp
-    28 00000004 6A00                    	push	0x0
+    28 00000004 6A00                    	push	0x0			; for stack alignment
     29 00000006 4889E5                      mov 	rbp,rsp
     30                                  ; print number1
     31 00000009 48BE-                   	mov     rsi, msgn1				

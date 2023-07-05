@@ -16,81 +16,81 @@
     16                                  
     17                                  printb:
     18                                  section .data
-    19 00000008 20                          strspace    db "",32
-    20 00000009 3F                          strLen      db  63
-    21 0000000A 31                          str1        db "1"
-    22 0000000B 30                          str0        db "0"
-    23 0000000C 2573                        fmtstr      db "%s"
+    19 00000008 2000                        strspace    db " ",0
+    20 0000000A 3F00000000000000            strLen      dq  63
+    21 00000012 3100                        str1        db "1",0
+    22 00000014 3000                        str0        db "0",0
+    23 00000016 2573                        fmtstr      db "%s"
     24                                  section .bss
     25                                  section .text
     26 00000013 55                          push    rbp
     27 00000014 4889E5                      mov     rbp,rsp
     28                                      
-    29 00000017 48B9-                       mov     rcx, strLen
-    29 00000019 [0900000000000000] 
-    30 00000021 41BC00000000                mov     r12, 0
-    31                                  
-    32                                  Initialloop:
-    33                                      ; check if eighth bit, if yes, print space
-    34 00000027 4831C0                      xor     rax,rax      ; clear rax (used in IDIV)
-    35 0000002A 31D2                        xor     edx, edx     ; clear edx (used in IDIV, stores the remainder)  
-    36 0000002C 66B80800                    mov     ax, 8
-    37 00000030 4489E3                      mov     ebx, r12d
-    38 00000033 FFC3                        inc     ebx         
-    39 00000035 F7FB                        idiv    ebx         ; divide the contents of EDX:EAX by the contents of EBX. 
-    40                                                          ; TODO:  Doesnt work. Remainder will also be zero when deviding by 2 and 4 
-    41 00000037 83FA00                      cmp     edx, 0x0    ; remainder is stored in edx
-    42 0000003A 7535                        jne     Printloop
-    43 0000003C 57                          push    rdi
-    44 0000003D 6A00                        push    0x0         ; for stack alignment
-    45 0000003F 48BF-                       mov	    rdi, fmtstr
-    45 00000041 [0C00000000000000] 
-    46 00000049 48BE-                       mov     rsi, strspace
-    46 0000004B [0800000000000000] 
-    47 00000053 B800000000                  mov	    rax,0       ; no floating point
-    48 00000058 E8(00000000)                call    printf
-    49 0000005D 4883C408                    add     rsp,8       ; skip the 0x0 that was pushed to the stack prior to function call
-    50 00000061 5F                          pop     rdi
-    51 00000062 4C3B2425[09000000]          cmp     r12, [strLen] ; TODO; I dont think this works?
-    52 0000006A 7464                        jz      exit
-    53 0000006C 49FFC4                      inc     r12
-    54 0000006F EBB6                        jmp     Initialloop
-    55                                  
-    56                                  Printloop:
-    57                                      ; check if bit equals 1, then print 1 else print 0
-    58                                      ; test ah, 1<<1
-    59 00000071 48D1EF                      shr     rdi, 1  ; does this work?
-    60 00000074 732C                        jnc     write1  ; jump no carry (means the bit is zero)
-    61 00000076 57                          push    rdi
-    62 00000077 6A00                        push    0x0
-    63 00000079 48BF-                       mov	    rdi, fmtstr
-    63 0000007B [0C00000000000000] 
-    64 00000083 48BE-                       mov     rsi, str1   ; TODO; prints 10?
-    64 00000085 [0A00000000000000] 
-    65 0000008D B800000000                  mov	    rax, 0		
-    66 00000092 E8(00000000)                call    printf
-    67 00000097 4883C408                    add     rsp,8
-    68 0000009B 5F                          pop     rdi
-    69 0000009C 5F                          pop     rdi
-    70 0000009D 49FFC4                      inc     r12
-    71 000000A0 EB85                        jmp     Initialloop
-    72                                  
-    73                                  write1:
-    74 000000A2 57                          push    rdi
-    75 000000A3 6A00                        push    0x0
-    76 000000A5 48BF-                       mov	    rdi, fmtstr
-    76 000000A7 [0C00000000000000] 
-    77 000000AF 48BE-                       mov     rsi, str0
-    77 000000B1 [0B00000000000000] 
-    78 000000B9 B800000000                  mov	    rax, 0		
-    79 000000BE E8(00000000)                call    printf
-    80 000000C3 4883C408                    add     rsp,8
-    81 000000C7 5F                          pop     rdi
-    82 000000C8 49FFC4                      inc     r12
-    83 000000CB E957FFFFFF                  jmp     Initialloop
-    84                                  
-    85                                  exit:
-    86 000000D0 4889EC                      mov 	rsp,rbp
-    87 000000D3 5D                          pop 	rbp
-    88 000000D4 C3                          ret
-    89                                  
+    29 00000017 41BC00000000                mov     r12, 0
+    30                                  
+    31                                  Initialloop:
+    32                                      ; check if end of string
+    33 0000001D 4C3B2425[0A000000]          cmp     r12, [strLen]
+    34 00000025 0F84A7000000                je      exit
+    35                                      ; check if eighth bit, if yes, print space
+    36 0000002B 4831C0                      xor     rax,rax     ; clear rax (used in IDIV)
+    37 0000002E 4831D2                      xor     rdx, rdx    ; clear edx (used in IDIV, stores the remainder)  
+    38 00000031 4183FC00                    cmp     r12d, 0     ; Avoid dividing with 0 
+    39 00000035 743A                        je      Printloop      
+    40                                      
+    41 00000037 4489E0                      mov     eax, r12d   ; r12 is the counter
+    42 0000003A BB08000000                  mov     ebx, 8      ; TODO: It prints a space after every 7 bit it should be after every 8
+    43 0000003F F7FB                        idiv    ebx         ; divide the contents of EDX:EAX by the contents of EBX. 
+    44 00000041 83FA00                      cmp     edx, 0x0    ; remainder is stored in edx
+    45 00000044 752B                        jne     Printloop   ; print 1 or 0
+    46                                      ; else print space
+    47 00000046 57                          push    rdi
+    48 00000047 6A00                        push    0x0         ; for stack alignment
+    49 00000049 48BF-                       mov	    rdi, strspace
+    49 0000004B [0800000000000000] 
+    50 00000053 48BE-                       mov     rsi, fmtstr
+    50 00000055 [1600000000000000] 
+    51 0000005D B800000000                  mov	    rax,0       ; no floating point
+    52 00000062 E8(00000000)                call    printf  
+    53 00000067 4883C408                    add     rsp,8       ; skip the 0x0 that was pushed for alignment
+    54 0000006B 5F                          pop     rdi
+    55 0000006C 49FFC4                      inc     r12
+    56 0000006F EBAC                        jmp     Initialloop
+    57                                  
+    58                                  Printloop:
+    59                                      ; check if bit equals 1, then print 1 else print 0
+    60                                      ; test ah, 1<<1
+    61 00000071 48D1EF                      shr     rdi, 1  
+    62 00000074 732E                        jnc     write1      ; jump no carry (means the bit is zero)
+    63 00000076 57                          push    rdi
+    64 00000077 6A00                        push    0x0
+    65 00000079 48BF-                       mov	    rdi, fmtstr
+    65 0000007B [1600000000000000] 
+    66 00000083 48BE-                       mov     rsi, str1   
+    66 00000085 [1200000000000000] 
+    67 0000008D B800000000                  mov	    rax, 0		
+    68 00000092 E8(00000000)                call    printf
+    69 00000097 4883C408                    add     rsp,8
+    70 0000009B 5F                          pop     rdi
+    71 0000009C 49FFC4                      inc     r12
+    72 0000009F E979FFFFFF                  jmp     Initialloop
+    73                                  
+    74                                  write1:
+    75 000000A4 57                          push    rdi
+    76 000000A5 6A00                        push    0x0
+    77 000000A7 48BF-                       mov	    rdi, fmtstr
+    77 000000A9 [1600000000000000] 
+    78 000000B1 48BE-                       mov     rsi, str0
+    78 000000B3 [1400000000000000] 
+    79 000000BB B800000000                  mov	    rax, 0		
+    80 000000C0 E8(00000000)                call    printf
+    81 000000C5 4883C408                    add     rsp,8
+    82 000000C9 5F                          pop     rdi
+    83 000000CA 49FFC4                      inc     r12
+    84 000000CD E94BFFFFFF                  jmp     Initialloop
+    85                                  
+    86                                  exit:
+    87 000000D2 4889EC                      mov 	rsp,rbp
+    88 000000D5 5D                          pop 	rbp
+    89 000000D6 C3                          ret
+    90                                  
