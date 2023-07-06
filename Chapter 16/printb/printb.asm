@@ -1,8 +1,9 @@
 ; printb.asm
+; program that takes an argument (in rdi) and prints every bit (64 bit)
 BITS 64:
 extern printf
 section .data				
-    number1	dq	-72
+    number1	dq	-72 ; The number which binary representation, will be printed.
 section .bss													
 section .text									
 	global main						
@@ -17,48 +18,25 @@ main:
 printb:
 section .data
     strspace    db " ",0
-    strLen      dq  63
+    strLen      dq  64
     str1        db "1",0
     str0        db "0",0
-    fmtstr      db "%s"
+    fmtstr      db "%s",0
+    strNl       db 10,0     ; prints new line
 section .bss
 section .text
     push    rbp
     mov     rbp,rsp
-    mov     r12, 0
+    mov     r12, 0    
 
-Initialloop:
+printLoop:
     ; check if end of string
     cmp     r12, [strLen]
-    je      exit
-    ; check if eighth bit, if yes, print space 
-    cmp     r12d, 0     ; Avoid dividing with 0 
-    je      Printloop      
-    
-    xor     rax,rax     ; clear rax (used in IDIV)
-    xor     rdx, rdx    ; clear edx (used in IDIV, stores the remainder) 
-    mov     eax, r12d   ; r12 is the counter
-    mov     ebx, 8      ; TODO: It prints a space after every 7 bit it should be after every 8
-    idiv    ebx         ; divide the contents of EDX:EAX by the contents of EBX. 
-    cmp     edx, 0x0    ; remainder is stored in edx
-    jne     Printloop   ; print 1 or 0
-    ; else print space
-    push    rdi
-    push    0x0         ; for stack alignment
-    mov	    rdi, strspace
-    mov     rsi, fmtstr
-    mov	    rax,0       ; no floating point
-    call    printf  
-    add     rsp,8       ; skip the 0x0 that was pushed for alignment
-    pop     rdi
-    inc     r12
-    jmp     Initialloop
-
-Printloop:
+    je      exit        ; TODO: Jump greater
     ; check if bit equals 1, then print 1 else print 0
     ; test ah, 1<<1
-    shr     rdi, 1  
-    jnc     write1      ; jump no carry (means the bit is zero)
+    shl     rdi, 1  
+    jnc     write0      ; jump no carry (means the bit is zero)
     push    rdi
     push    0x0
     mov	    rdi, fmtstr
@@ -67,10 +45,9 @@ Printloop:
     call    printf
     add     rsp,8
     pop     rdi
-    inc     r12
-    jmp     Initialloop
+    jmp     writeSpace
 
-write1:
+write0:
     push    rdi
     push    0x0
     mov	    rdi, fmtstr
@@ -79,10 +56,35 @@ write1:
     call    printf
     add     rsp,8
     pop     rdi
-    inc     r12
-    jmp     Initialloop
+    
+writeSpace:
+    ; check for 8th bit
+    xor     rax,rax     ; clear rax (used in IDIV)
+    xor     rdx, rdx    ; clear edx (used in IDIV, stores the remainder) 
+    mov     eax, r12d   ; r12 is the counter
+    inc     r12         ; increment counter
+    inc     eax         ; increment because every 9th place shoudl be a space
+    mov     ebx, 8
+    idiv    ebx         ; divide the contents of EDX:EAX by the contents of EBX. 
+    cmp     edx, 0x0    ; remainder is stored in edx
+    jne     printLoop   ; print 1 or 0
+    ; print space
+    push    rdi
+    push    0x0         ; for stack alignment
+    mov	    rdi, strspace
+    mov     rsi, fmtstr
+    mov	    rax,0       ; no floating point
+    call    printf  
+    add     rsp,8       ; skip the 0x0 that was pushed for alignment
+    pop     rdi         ; pops the number back into rdi
+    jmp     printLoop
+    
 
 exit:
+    mov	    rdi, fmtstr
+    mov     rsi, strNl  ; prints a newline
+    mov	    rax, 0		
+    call    printf
     mov 	rsp,rbp
     pop 	rbp
     ret
