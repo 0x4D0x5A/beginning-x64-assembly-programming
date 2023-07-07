@@ -1,0 +1,131 @@
+     1                                  ; bits3.asm
+     2                                  extern printb  
+     3                                  extern printf
+     4                                  section .data
+     5 00000000 4E6F20626974732061-     	msg1 db "No bits are set:",10,0										
+     5 00000009 7265207365743A0A00 
+     6 00000012 0A5365742062697420-     	msg2 db 10,"Set bit #4, that is the 5th bit:",10,0	
+     6 0000001B 23342C207468617420-
+     6 00000024 697320746865203574-
+     6 0000002D 68206269743A0A00   
+     7 00000035 0A5365742062697420-     	msg3 db 10,"Set bit #7, that is the 8th bit:",10,0
+     7 0000003E 23372C207468617420-
+     7 00000047 697320746865203874-
+     7 00000050 68206269743A0A00   
+     8 00000058 0A5365742062697420-     	msg4 db 10,"Set bit #8, that is the 9th bit:",10,0
+     8 00000061 23382C207468617420-
+     8 0000006A 697320746865203974-
+     8 00000073 68206269743A0A00   
+     9 0000007B 0A5365742062697420-     	msg5 db 10,"Set bit #61, that is the 62nd bit:",10,0
+     9 00000084 2336312C2074686174-
+     9 0000008D 206973207468652036-
+     9 00000096 326E64206269743A0A-
+     9 0000009F 00                 
+    10 000000A0 0A436C656172206269-     	msg6 db 10,"Clear bit #8, that is the 9th bit:",10,0
+    10 000000A9 742023382C20746861-
+    10 000000B2 742069732074686520-
+    10 000000BB 397468206269743A0A-
+    10 000000C4 00                 
+    11 000000C5 0A5465737420626974-     	msg7 db 10,"Test bit #61, and display rdi",10,0
+    11 000000CE 202336312C20616E64-
+    11 000000D7 20646973706C617920-
+    11 000000E0 7264690A00         
+    12 000000E5 0000000000000000        	bitflags	dq	0
+    13                                  section .bss
+    14                                  section .text							
+    15                                  	global main						
+    16                                  main:
+    17 00000000 4889E5                      mov rbp, rsp; for correct debugging
+    18 00000003 55                      	push rbp
+    19 00000004 4889E5                  	mov rbp,rsp
+    20                                  	;print title
+    21 00000007 48BF-                   	mov rdi, msg1
+    21 00000009 [0000000000000000] 
+    22 00000011 4831C0                  	xor rax,rax
+    23 00000014 E8(00000000)            	call printf
+    24                                  
+    25                                  	;print bitflags
+    26 00000019 488B3C25[E5000000]          	mov rdi, [bitflags]
+    27 00000021 E8(00000000)            	call printb
+    28                                  
+    29                                  ;set bit 4 (=5th bit)
+    30                                  	;print title
+    31 00000026 48BF-                   	mov rdi, msg2
+    31 00000028 [1200000000000000] 
+    32 00000030 4831C0                  	xor rax,rax
+    33 00000033 E8(00000000)            	call printf
+    34                                  
+    35 00000038 480FBA2C25-             	bts	qword [bitflags],4 	; set bit 4
+    35 0000003D [E5000000]04       
+    36                                  	;print bitflags
+    37 00000042 488B3C25[E5000000]          	mov rdi, [bitflags]
+    38 0000004A E8(00000000)            	call printb
+    39                                  
+    40                                  ;set bit 7 (=8th bit)
+    41                                  	;print title
+    42 0000004F 48BF-                   	mov rdi, msg3
+    42 00000051 [3500000000000000] 
+    43 00000059 4831C0                  	xor rax,rax
+    44 0000005C E8(00000000)            	call printf
+    45                                  
+    46 00000061 480FBA2C25-             	bts	qword [bitflags],7 	; set bit 7
+    46 00000066 [E5000000]07       
+    47                                  	;print bitflags
+    48 0000006B 488B3C25[E5000000]          	mov rdi, [bitflags]
+    49 00000073 E8(00000000)            	call printb
+    50                                  
+    51                                  ;set bit 8 (=9th bit)
+    52                                  	;print title
+    53 00000078 48BF-                   	mov rdi, msg4
+    53 0000007A [5800000000000000] 
+    54 00000082 4831C0                  	xor rax,rax
+    55 00000085 E8(00000000)            	call printf
+    56                                  
+    57 0000008A 480FBA2C25-             	bts	qword [bitflags],8 	; set bit 8
+    57 0000008F [E5000000]08       
+    58                                  	;print bitflags
+    59 00000094 488B3C25[E5000000]          	mov rdi, [bitflags]
+    60 0000009C E8(00000000)            	call printb
+    61                                  
+    62                                  ;set bit 61 (=62nd bit)
+    63                                  	;print title
+    64 000000A1 48BF-                   	mov rdi, msg5
+    64 000000A3 [7B00000000000000] 
+    65 000000AB 4831C0                  	xor rax,rax
+    66 000000AE E8(00000000)            	call printf
+    67                                  
+    68 000000B3 480FBA2C25-             	bts	qword [bitflags],61 	; set bit 61
+    68 000000B8 [E5000000]3D       
+    69                                  	;print bitflags
+    70 000000BD 488B3C25[E5000000]          	mov rdi, [bitflags]
+    71 000000C5 E8(00000000)            	call printb
+    72                                  
+    73                                  ;clear bit 8 (=9th bit)
+    74                                  	;print title
+    75 000000CA 48BF-                   	mov rdi, msg6
+    75 000000CC [A000000000000000] 
+    76 000000D4 4831C0                  	xor rax,rax
+    77 000000D7 E8(00000000)            	call printf
+    78                                  
+    79 000000DC 480FBA3425-             	btr	qword [bitflags],8	; bit reset 8
+    79 000000E1 [E5000000]08       
+    80                                  	;print bitflags
+    81 000000E6 488B3C25[E5000000]          	mov rdi, [bitflags]
+    82 000000EE E8(00000000)            	call printb
+    83                                  
+    84                                  ; test bit 61 (will set carry flag CF if 1)
+    85                                  	;print title
+    86 000000F3 48BF-                   	mov rdi, msg7
+    86 000000F5 [C500000000000000] 
+    87 000000FD 4831C0                  	xor rax,rax
+    88 00000100 E8(00000000)            	call printf
+    89 00000105 4831FF                          xor rdi,rdi
+    90 00000108 B83D000000              	mov	rax,61			; bit 61 to be tested
+    91 0000010D 4831D2                  	xor	rdx,rdx           	; make sure all bits are 0
+    92 00000110 480FA30425-             	bt	[bitflags],rax		; bit test
+    92 00000115 [E5000000]         
+    93 00000119 400F92C7                	setc dil                      ; set dil (=low rdi) to 1 if CF is set
+    94 0000011D E8(00000000)            	call printb			; display rdi		
+    95                                  
+    96 00000122 C9                      leave
+    97 00000123 C3                      ret

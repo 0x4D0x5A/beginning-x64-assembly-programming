@@ -90,7 +90,7 @@ main:
 	mov	rax,61			; bit 61 to be tested
 	xor	rdx,rdx           	; make sure all bits are 0
 	bt	[bitflags],rax		; bit test
-	setc	dil                      ; set dil (=low rdi) to 1 if CF is set
+	setc dil                      ; set dil (=low rdi) to 1 if CF is set
 	call printb			; display rdi		
 
 leave
