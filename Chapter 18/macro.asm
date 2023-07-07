@@ -1,11 +1,12 @@
 ; macro.asm
+BITS 64:
 extern printf
 
 %define	double_it(r)	sal r, 1	; single line macro
 
 %macro	prntf	2			; multiline macro with 2 arguments
 	section .data
-			%%arg1	db	%1,0         	; first argument
+			%%arg1		db	%1,0         	; first argument
 			%%fmtint	db	"%s %ld",10,0 	; formatstring
 	section .text				; the printf arguments
 		mov	rdi, %%fmtint
