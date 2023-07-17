@@ -1,0 +1,66 @@
+     1                                  ; console1.asm
+     2                                  BITS 64:
+     3                                  section .data							
+     4 00000000 48656C6C6F2C20576F-     	msg1	db   	"Hello, World!",10,0
+     4 00000009 726C64210A00       
+     5                                  	msg1len	equ		$-msg1			
+     6 0000000F 596F7572207475726E-        	msg2 	db    	"Your turn: ",0
+     6 00000018 3A2000             
+     7                                  	msg2len	equ		$-msg2
+     8 0000001B 596F7520616E737765-       	msg3  	db    	"You answered: ",0
+     8 00000024 7265643A2000       
+     9                                  	msg3len	equ		$-msg3
+    10                                     	inputlen equ 	10			;length of inputbuffer				
+    11                                  section .bss							
+    12 00000000 <res Bh>                   	input resb inputlen+1 		;provide space for ending 0
+    13                                  section .text							
+    14                                  	global main						
+    15                                  main:
+    16 00000000 55                      push	rbp
+    17 00000001 4889E5                  mov 	rbp,rsp
+    18 00000004 48BE-                   	mov 	rsi, msg1    	; print first string
+    18 00000006 [0000000000000000] 
+    19 0000000E BA0F000000              	mov		rdx, msg1len
+    20 00000013 E852000000              	call 	prints   
+    21 00000018 48BE-                   	mov 	rsi, msg2		; print second string, no NL
+    21 0000001A [0F00000000000000] 
+    22 00000022 BA0C000000              	mov		rdx, msg2len
+    23 00000027 E83E000000              	call 	prints
+    24 0000002C 48BE-                   	mov 	rsi, input    	; address of inputbuffer
+    24 0000002E [0000000000000000] 
+    25 00000036 BA0A000000              	mov 	rdx, inputlen	; length of inputbuffer
+    26 0000003B E83C000000              	call 	reads			; wait for input
+    27 00000040 48BE-                   	mov 	rsi, msg3       ; print third string 
+    27 00000042 [1B00000000000000] 
+    28 0000004A BA0F000000              	mov		rdx, msg3len	
+    29 0000004F E816000000              	call 	prints
+    30 00000054 48BE-                   	mov 	rsi, input    	; print the inputbuffer
+    30 00000056 [0000000000000000] 
+    31 0000005E BA0A000000              	mov 	rdx, inputlen	; length of inputbuffer
+    32 00000063 E802000000              	call 	prints
+    33 00000068 C9                      leave
+    34 00000069 C3                      ret
+    35                                  ;----------------------------------------------------
+    36                                  prints:
+    37 0000006A 55                      push	rbp
+    38 0000006B 4889E5                  mov		rbp, rsp
+    39                                  ; rsi contains address of string
+    40                                  ; rdx contains length of string
+    41 0000006E B801000000              	mov 	rax, 1  	; 1 = write
+    42 00000073 BF01000000              	mov 	rdi, 1		; 1 = stdout
+    43 00000078 0F05                    	syscall
+    44 0000007A C9                      leave
+    45 0000007B C3                      ret
+    46                                  ;----------------------------------------------------
+    47                                  reads:
+    48 0000007C 55                      push	rbp
+    49 0000007D 4889E5                  mov		rbp, rsp
+    50                                  ; rsi contains address of the inputbuffer
+    51                                  ; rdi contains length of the inputbuffer
+    52 00000080 B800000000                 	mov		rax, 0		; 0 = read
+    53 00000085 BF01000000              	mov 	rdi, 1		; 1 = stdin
+    54 0000008A 0F05                    	syscall
+    55 0000008C C9                      leave
+    56 0000008D C3                      ret			
+    57                                  
+    58                                  

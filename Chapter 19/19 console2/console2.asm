@@ -1,4 +1,5 @@
 ; console2.asm
+BITS 64:
 section .data							
 	msg1	db    	"Hello, World!",10,0			
    	msg2  	db   	"Your turn (only a-z): ",0
@@ -73,9 +74,9 @@ mov	rbp, rsp
     	lea 	rsi, [.inputchar] 	; address of input
     	mov 	rdx, 1      	; # of characters to read
     	syscall
-    	mov 	al, [.inputchar]  	; char is NL?
+    	mov 	al, [.inputchar]  	; char is NULL?
     	cmp 	al, byte[NL]
-    	je 		.done			; NL end
+    	je 		.done			; NULL end
 		cmp		al, 97			; lower than a?
 		jl		.readc			; ignore it
 		cmp		al, 122			; higher than z?

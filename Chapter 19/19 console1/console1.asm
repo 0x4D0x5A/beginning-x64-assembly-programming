@@ -1,4 +1,5 @@
 ; console1.asm
+BITS 64:
 section .data							
 	msg1	db   	"Hello, World!",10,0
 	msg1len	equ		$-msg1			

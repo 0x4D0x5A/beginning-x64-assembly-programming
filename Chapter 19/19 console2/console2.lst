@@ -1,0 +1,107 @@
+     1                                  ; console2.asm
+     2                                  BITS 64:
+     3                                  section .data							
+     4 00000000 48656C6C6F2C20576F-     	msg1	db    	"Hello, World!",10,0			
+     4 00000009 726C64210A00       
+     5 0000000F 596F7572207475726E-        	msg2  	db   	"Your turn (only a-z): ",0
+     5 00000018 20286F6E6C7920612D-
+     5 00000021 7A293A2000         
+     6 00000026 596F7520616E737765-       	msg3  	db    	"You answered: ",0
+     6 0000002F 7265643A2000       
+     7                                    	inputlen equ 	10			;inputbuffer
+     8 00000035 0A                      	NL		db		0xa					
+     9                                  section .bss							
+    10 00000000 <res Bh>                  	input resb inputlen+1 		;provide space for ending 0
+    11                                  section .text							
+    12                                  	global main						
+    13                                  main:
+    14 00000000 55                      push	rbp 
+    15 00000001 4889E5                  mov 	rbp,rsp
+    16 00000004 48BF-                   	mov 	rdi, msg1     	; print first string 
+    16 00000006 [0000000000000000] 
+    17 0000000E E852000000              	call 	prints    
+    18 00000013 48BF-                   	mov 	rdi, msg2	; print second string, no NL 
+    18 00000015 [0F00000000000000] 
+    19 0000001D E843000000              	call 	prints
+    20 00000022 48BF-                   	mov 	rdi, input    	; address of inputbuffer
+    20 00000024 [0000000000000000] 
+    21 0000002C BE0A000000              	mov 	rsi, inputlen	; length of inputbuffer 
+    22 00000031 E863000000              	call 	reads			; wait for input 
+    23 00000036 48BF-                   	mov 	rdi, msg3    	; print third string and add the input string
+    23 00000038 [2600000000000000] 
+    24 00000040 E820000000              	call 	prints
+    25 00000045 48BF-                   	mov 	rdi, input    	; print the inputbuffer
+    25 00000047 [0000000000000000] 
+    26 0000004F E811000000              	call 	prints
+    27 00000054 48BF-                     	mov 	rdi,NL 			; print NL
+    27 00000056 [3500000000000000] 
+    28 0000005E E802000000              	call 	prints     
+    29 00000063 C9                      leave
+    30 00000064 C3                      ret
+    31                                  ;----------------------------------------------------------
+    32                                  prints:
+    33 00000065 55                      push	rbp
+    34 00000066 4889E5                  mov		rbp, rsp
+    35 00000069 4154                    push	r12					; callee saved
+    36                                  
+    37                                  ; Count characters 
+    38 0000006B 4831D2                      	xor 	rdx, rdx 	; length in rdx
+    39 0000006E 4989FC                      	mov 	r12, rdi   
+    40                                  .lengthloop:
+    41 00000071 41803C2400                  	cmp 	byte [r12], 0
+    42 00000076 7408                        	je 		.lengthfound
+    43 00000078 48FFC2                      	inc 	rdx
+    44 0000007B 49FFC4                      	inc 	r12
+    45 0000007E EBF1                        	jmp 	.lengthloop
+    46                                  .lengthfound:		; print the string, length in rdx
+    47 00000080 4883FA00                    	cmp 	rdx, 0     	; no string (0 length)
+    48 00000084 740F                        	je 		.done
+    49 00000086 4889FE                      	mov 	rsi,rdi		; rdi contains address of string
+    50 00000089 B801000000                  	mov 	rax, 1  	; 1 = write
+    51 0000008E BF01000000                  	mov 	rdi, 1		; 1 = stdout
+    52 00000093 0F05                        	syscall
+    53                                  .done:
+    54 00000095 415C                    pop r12
+    55 00000097 C9                      leave 
+    56 00000098 C3                      ret
+    57                                  ;----------------------------------------------------------
+    58                                  reads:
+    59                                  section .data
+    60                                  section .bss
+    61 0000000B ??                          	.inputchar 	resb 	1  
+    62                                  section .text
+    63 00000099 55                      push	rbp
+    64 0000009A 4889E5                  mov	rbp, rsp
+    65 0000009D 4154                    	push	r12			; callee saved
+    66 0000009F 4155                    	push	r13			; callee saved
+    67 000000A1 4156                    	push	r14			; callee saved
+    68 000000A3 4989FC                  	mov 	r12, rdi	; address of stringbuffer
+    69 000000A6 4989F5                      mov 	r13, rsi   	; max length in r13
+    70 000000A9 4D31F6                     	xor 	r14, r14  	; character counter
+    71                                  .readc: 
+    72 000000AC B800000000                  	mov 	rax, 0   		; read
+    73 000000B1 BF01000000                  	mov 	rdi, 1      	; stdin
+    74 000000B6 488D3425[0B000000]          	lea 	rsi, [.inputchar] 	; address of input
+    75 000000BE BA01000000                  	mov 	rdx, 1      	; # of characters to read
+    76 000000C3 0F05                        	syscall
+    77 000000C5 8A0425[0B000000]            	mov 	al, [.inputchar]  	; char is NULL?
+    78 000000CC 3A0425[35000000]            	cmp 	al, byte[NL]
+    79 000000D3 7419                        	je 		.done			; NULL end
+    80 000000D5 3C61                    		cmp		al, 97			; lower than a?
+    81 000000D7 7CD3                    		jl		.readc			; ignore it
+    82 000000D9 3C7A                    		cmp		al, 122			; higher than z?
+    83 000000DB 7FCF                    		jg		.readc			; ignore it
+    84 000000DD 49FFC6                      	inc 	r14				; inc counter
+    85 000000E0 4D39EE                      	cmp 	r14, r13
+    86 000000E3 77C7                        	ja 		.readc       	; buffer max reached, ignore
+    87 000000E5 41880424                    	mov 	byte [r12], al 	; safe the char in the buffer
+    88 000000E9 49FFC4                      	inc 	r12           	; point to next char in buffer
+    89 000000EC EBBE                        	jmp 	.readc 
+    90                                  .done:
+    91 000000EE 49FFC4                      	inc 	r12
+    92 000000F1 41C6042400                  	mov 	byte [r12],0   	; add end 0 to stringbuffer
+    93 000000F6 415E                    	pop 	r14			; callee saved
+    94 000000F8 415D                    	pop		r13			; callee saved
+    95 000000FA 415C                    	pop		r12			; callee saved
+    96 000000FC C9                      leave
+    97 000000FD C3                      ret
