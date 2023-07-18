@@ -74,9 +74,9 @@ mov	rbp, rsp
     	lea 	rsi, [.inputchar] 	; address of input
     	mov 	rdx, 1      	; # of characters to read
     	syscall
-    	mov 	al, [.inputchar]  	; char is NULL?
+    	mov 	al, [.inputchar]  	; char is a New line (Enter?)
     	cmp 	al, byte[NL]
-    	je 		.done			; NULL end
+    	je 		.done			; New line = end
 		cmp		al, 97			; lower than a?
 		jl		.readc			; ignore it
 		cmp		al, 122			; higher than z?
