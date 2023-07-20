@@ -2,12 +2,12 @@
 section .data
 ; expressions used for conditional assembly
 	CREATE 		equ 	1
-	OVERWRITE 	equ 	1
-	APPEND 		equ 	1
-	O_WRITE 	equ 	1
-	READ 		equ 	1
-	O_READ 		equ 	1
-	DELETE 		equ 	1
+	OVERWRITE 	equ 	0
+	APPEND 		equ 	0
+	O_WRITE 	equ 	0
+	READ 		equ 	0
+	O_READ 		equ 	0
+	DELETE 		equ 	0
 			
 ; syscall symbols
     NR_read  	equ 	0 
