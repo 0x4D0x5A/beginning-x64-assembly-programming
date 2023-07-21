@@ -1,9 +1,10 @@
 ; move_strings.asm
+BITS 64:
 %macro prnt 2
     mov     rax, 1		; 1 = write		
     mov     rdi, 1		; 1 = to stdout			
-    mov     rsi, %1					
-    mov     rdx, %2						
+    mov     rsi, %1		; %1 = arg 1			
+    mov     rdx, %2		; %2 = arg 2		
     syscall
 	mov rax, 1
 	mov rdi, 1
@@ -23,7 +24,7 @@ section .data
 	string5 db 10,"copy my_string to other_string:"
 	string6 db 10,"reverse copy my_string to other_string:"
 section .bss
-        my_string  resb	length
+    my_string  resb	length
 	other_string resb length
 
 section .text							
@@ -37,9 +38,10 @@ mov 	rbp, rsp
 		mov rax,32
 		mov rdi,my_string
 		mov rcx, length
-str_loop1:	mov byte[rdi], al		; the simple method
+str_loop1:	
+		mov byte[rdi], al		; the simple method
 		inc rdi
-        	inc al
+        inc al
 		loop str_loop1
 		prnt my_string,length
 ;-----------------------------------------------------------------------
@@ -48,7 +50,8 @@ str_loop1:	mov byte[rdi], al		; the simple method
 		mov rax,48
 		mov rdi,my_string
 		mov rcx, length
-str_loop2:	stosb				; no inc rdi needed anymore
+str_loop2:	
+		stosb				; no inc rdi needed anymore. loads EAX into EDI
 		loop str_loop2
 		prnt my_string,length
 ;-----------------------------------------------------------------------
@@ -57,7 +60,7 @@ str_loop2:	stosb				; no inc rdi needed anymore
 		mov rax, 49
 		mov rdi,my_string
 		mov rcx, length
-        	rep stosb			; no inc rdi and no loop needed anymore
+        rep stosb			; no inc rdi and no loop needed anymore. Repeats string operation (stosb) until counter register (rcx) equals zero
 		prnt my_string,length
 ;-----------------------------------------------------------------------
 ;fill the string again with printable ascii characters
@@ -65,7 +68,8 @@ str_loop2:	stosb				; no inc rdi needed anymore
 		mov rax,32
 		mov rdi,my_string
 		mov rcx, length
-str_loop3:	mov byte[rdi], al		; the simple method
+str_loop3:	
+		mov byte[rdi], al		; the simple method
 		inc rdi
       	inc al
 		loop str_loop3
@@ -84,7 +88,7 @@ str_loop3:	mov byte[rdi], al		; the simple method
 		mov rax, 48			;clear other_string
 		mov rdi,other_string
 		mov rcx, length
-    		rep stosb			
+    	rep stosb			;loads EAX into EDI -Repeats string operation (stosb) until counter register (rcx) equals zero
 		lea rsi,[my_string+length-4]
 		lea rdi,[other_string+length]
 		mov rcx, 27			;copy only ten characters
