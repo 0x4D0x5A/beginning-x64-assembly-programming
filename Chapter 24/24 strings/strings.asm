@@ -1,4 +1,5 @@
 ; strings.asm
+BITS 64:
 extern	printf										
 section .data							
 	string1 	db "This is the 1st string.",10,0
@@ -99,14 +100,16 @@ ret
 ; FUNCTIONS ======================================================================================
 
 ; function compare 2 strings ---------------------------------------------------------------------
-compare1:	mov rcx, rdx
+compare1:	
+		mov rcx, rdx
 		cld
 cmpr:	cmpsb
 		jne notequal
 		loop cmpr
 		xor rax,rax
 		ret
-notequal:	mov rax, strlen2
+notequal:	
+		mov rax, strlen2
 		dec rcx		;compute position
 		sub rax,rcx	;compute position
 		ret
