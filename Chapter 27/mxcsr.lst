@@ -1,0 +1,220 @@
+     1                                  ; mxcsr.asm
+     2                                  extern printf
+     3                                  extern print_mxcsr
+     4                                  extern print_hex
+     5                                  section .data							
+     6 00000000 0000000000002640        	eleven		dq	11.0					
+     7 00000008 0000000000000040        	two			dq	2.0
+     8 00000010 0000000000000840           	three 		dq  3.0
+     9 00000018 0000000000002440         	ten 		dq  10.0
+    10 00000020 0000000000000000           	zero    	dq  0.0
+    11 00000028 307800                  	hex			db	"0x",0
+    12 0000002B 0A4469766964652C20-     	fmt1		db	10,"Divide, default mxcsr:",10,0
+    12 00000034 64656661756C74206D-
+    12 0000003D 786373723A0A00     
+    13 00000044 0A4469766964652062-     	fmt2		db	10,"Divide by zero, default mxcsr:",10,0
+    13 0000004D 79207A65726F2C2064-
+    13 00000056 656661756C74206D78-
+    13 0000005F 6373723A0A00       
+    14 00000065 0A4469766964652C20-       	fmt4    	db  10,"Divide, round up:",10,0
+    14 0000006E 726F756E642075703A-
+    14 00000077 0A00               
+    15 00000079 0A4469766964652C20-       	fmt5    	db 	10,"Divide, round down:",10,0
+    15 00000082 726F756E6420646F77-
+    15 0000008B 6E3A0A00           
+    16 0000008F 0A4469766964652C20-        	fmt6    	db  10,"Divide, truncate:",10,0        						
+    16 00000098 7472756E636174653A-
+    16 000000A1 0A00               
+    17 000000A3 252E31662064697669-     	f_div		db	"%.1f divided by %.1f is %.16f, in hex: ",0
+    17 000000AC 64656420627920252E-
+    17 000000B5 316620697320252E31-
+    17 000000BE 36662C20696E206865-
+    17 000000C7 783A2000           
+    18 000000CB 0A6D78637372206265-       	f_before 	db 	10,"mxcsr before:",9,0
+    18 000000D4 666F72653A0900     
+    19 000000DB 6D7863737220616674-        	f_after 	db 	"mxcsr after:",9,0
+    19 000000E4 65723A0900         
+    20                                  
+    21                                  ;mxcsr values
+    22 000000E9 801F0000                	default_mxcsr	dd 0001111110000000b
+    23 000000ED 801F0000                	round_nearest	dd 0001111110000000b
+    24 000000F1 803F0000                	round_down		dd 0011111110000000b
+    25 000000F5 805F0000                	round_up		dd 0101111110000000b
+    26 000000F9 807F0000                	truncate		dd 0111111110000000b
+    27                                  
+    28                                  section .bss
+    29 00000000 ????????                        mxcsr_before 	resd    1
+    30 00000004 ????????                        mxcsr_after   	resd    1
+    31 00000008 ????????????????                xmm 			resq 	1
+    32                                  section .text							
+    33                                  	global main					
+    34                                  main:
+    35 00000000 4889E5                  mov 	rbp, rsp; for correct debugging
+    36 00000003 55                      push 	rbp
+    37 00000004 4889E5                  mov 	rbp,rsp
+    38                                  
+    39                                  ;division
+    40                                  ;default mxcsr
+    41 00000007 48BF-                   	mov 	rdi,fmt1
+    41 00000009 [2B00000000000000] 
+    42 00000011 48BE-                   	mov 	rsi,ten
+    42 00000013 [1800000000000000] 
+    43 0000001B 48BA-                   	mov 	rdx,two
+    43 0000001D [0800000000000000] 
+    44 00000025 8B0C25[E9000000]        	mov 	ecx, [default_mxcsr]
+    45 0000002C E87C010000              	call apply_mxcsr
+    46                                  ;----------------------------------------------
+    47                                  ;division with precision error
+    48                                  ;default mxcsr
+    49 00000031 48BF-                   	mov 	rdi,fmt1
+    49 00000033 [2B00000000000000] 
+    50 0000003B 48BE-                   	mov 	rsi,ten
+    50 0000003D [1800000000000000] 
+    51 00000045 48BA-                   	mov 	rdx,three
+    51 00000047 [1000000000000000] 
+    52 0000004F 8B0C25[E9000000]        	mov 	ecx, [default_mxcsr]
+    53 00000056 E852010000              	call apply_mxcsr
+    54                                  ;divide by zero
+    55                                  ;default mxcsr
+    56 0000005B 48BF-                   	mov 	rdi,fmt2
+    56 0000005D [4400000000000000] 
+    57 00000065 48BE-                   	mov 	rsi,ten
+    57 00000067 [1800000000000000] 
+    58 0000006F 48BA-                   	mov 	rdx,zero
+    58 00000071 [2000000000000000] 
+    59 00000079 8B0C25[E9000000]        	mov 	ecx, [default_mxcsr]
+    60 00000080 E828010000              	call apply_mxcsr
+    61                                  ;division with precision error
+    62                                  ;round up
+    63 00000085 48BF-                   	mov 	rdi,fmt4
+    63 00000087 [6500000000000000] 
+    64 0000008F 48BE-                   	mov 	rsi,ten
+    64 00000091 [1800000000000000] 
+    65 00000099 48BA-                   	mov 	rdx,three
+    65 0000009B [1000000000000000] 
+    66 000000A3 8B0C25[F5000000]        	mov 	ecx, [round_up]
+    67 000000AA E8FE000000              	call apply_mxcsr
+    68                                  ;division with precision error
+    69                                  ;round up
+    70 000000AF 48BF-                   	mov 	rdi,fmt5
+    70 000000B1 [7900000000000000] 
+    71 000000B9 48BE-                   	mov 	rsi,ten
+    71 000000BB [1800000000000000] 
+    72 000000C3 48BA-                   	mov 	rdx,three
+    72 000000C5 [1000000000000000] 
+    73 000000CD 8B0C25[F1000000]        	mov 	ecx, [round_down]
+    74 000000D4 E8D4000000              	call apply_mxcsr
+    75                                  ;division with precision error
+    76                                  ;truncate
+    77 000000D9 48BF-                   	mov 	rdi,fmt6
+    77 000000DB [8F00000000000000] 
+    78 000000E3 48BE-                   	mov 	rsi,ten
+    78 000000E5 [1800000000000000] 
+    79 000000ED 48BA-                   	mov 	rdx,three
+    79 000000EF [1000000000000000] 
+    80 000000F7 8B0C25[F9000000]        	mov 	ecx, [truncate]
+    81 000000FE E8AA000000              	call apply_mxcsr
+    82                                  ;----------------------------------------------
+    83                                  ;division with precision error
+    84                                  ;default mxcsr
+    85 00000103 48BF-                   	mov 	rdi,fmt1
+    85 00000105 [2B00000000000000] 
+    86 0000010D 48BE-                   	mov 	rsi,eleven
+    86 0000010F [0000000000000000] 
+    87 00000117 48BA-                   	mov 	rdx,three
+    87 00000119 [1000000000000000] 
+    88 00000121 8B0C25[E9000000]        	mov 	ecx, [default_mxcsr]
+    89 00000128 E880000000              	call apply_mxcsr;division with precision error
+    90                                  ;round up
+    91 0000012D 48BF-                   	mov 	rdi,fmt4
+    91 0000012F [6500000000000000] 
+    92 00000137 48BE-                   	mov 	rsi,eleven
+    92 00000139 [0000000000000000] 
+    93 00000141 48BA-                   	mov 	rdx,three
+    93 00000143 [1000000000000000] 
+    94 0000014B 8B0C25[F5000000]        	mov 	ecx, [round_up]
+    95 00000152 E856000000              	call apply_mxcsr
+    96                                  ;division with precision error
+    97                                  ;round up
+    98 00000157 48BF-                   	mov 	rdi,fmt5
+    98 00000159 [7900000000000000] 
+    99 00000161 48BE-                   	mov 	rsi,eleven
+    99 00000163 [0000000000000000] 
+   100 0000016B 48BA-                   	mov 	rdx,three
+   100 0000016D [1000000000000000] 
+   101 00000175 8B0C25[F1000000]        	mov 	ecx, [round_down]
+   102 0000017C E82C000000              	call apply_mxcsr
+   103                                  ;division with precision error
+   104                                  ;truncate
+   105 00000181 48BF-                   	mov 	rdi,fmt6
+   105 00000183 [8F00000000000000] 
+   106 0000018B 48BE-                   	mov 	rsi,eleven
+   106 0000018D [0000000000000000] 
+   107 00000195 48BA-                   	mov 	rdx,three
+   107 00000197 [1000000000000000] 
+   108 0000019F 8B0C25[F9000000]        	mov 	ecx, [truncate]
+   109 000001A6 E802000000              	call apply_mxcsr
+   110 000001AB C9                      leave
+   111 000001AC C3                      ret                                                                                                                         
+   112                                  
+   113                                  ;function ------------------------------------------------------------ 
+   114                                  ;Division happens in this function    
+   115                                  apply_mxcsr:   
+   116 000001AD 55                      push	rbp
+   117 000001AE 4889E5                  mov 	rbp,rsp
+   118 000001B1 56                          push 	rsi
+   119 000001B2 52                          push	rdx
+   120 000001B3 51                          push	rcx
+   121 000001B4 55                          push	rbp            ; one more for stack alignment
+   122 000001B5 E8(00000000)            	call	printf
+   123 000001BA 5D                          pop 	rbp
+   124 000001BB 59                          pop 	rcx
+   125 000001BC 5A                          pop 	rdx
+   126 000001BD 5E                          pop 	rsi
+   127                                  
+   128 000001BE 890C25[00000000]        	mov 	[mxcsr_before],ecx
+   129 000001C5 0FAE1425[00000000]          ldmxcsr [mxcsr_before]	; loads mxcsr register with source opperand
+   130 000001CD F20F1016                    movsd 	xmm2, [rsi]		; double precision float into xmm2
+   131 000001D1 F20F5E12                    divsd 	xmm2, [rdx]		; divide xmm2 
+   132 000001D5 0FAE1C25[04000000]          stmxcsr [mxcsr_after] 	; save mxcsr to memory
+   133 000001DD F20F111425-                 movsd 	[xmm],xmm2  	; for use in print_xmm
+   133 000001E2 [08000000]         
+   134 000001E6 48BF-                       mov 	rdi,f_div
+   134 000001E8 [A300000000000000] 
+   135 000001F0 F20F1006                    movsd	xmm0, [rsi]
+   136 000001F4 F20F100A                    movsd 	xmm1, [rdx]
+   137 000001F8 E8(00000000)                call 	printf
+   138 000001FD E83A000000                  call 	print_xmm
+   139                                  ;print mxcsr
+   140 00000202 48BF-                   	mov 	rdi,f_before
+   140 00000204 [CB00000000000000] 
+   141 0000020C E8(00000000)            	call 	printf
+   142 00000211 488B3C25[00000000]      	mov 	rdi, [mxcsr_before]
+   143 00000219 E8(00000000)            	call 	print_mxcsr
+   144 0000021E 48BF-                   	mov 	rdi,f_after
+   144 00000220 [DB00000000000000] 
+   145 00000228 E8(00000000)            	call 	printf
+   146 0000022D 488B3C25[04000000]      	mov 	rdi, [mxcsr_after]
+   147 00000235 E8(00000000)            	call	print_mxcsr
+   148 0000023A C9                      leave
+   149 0000023B C3                      ret
+   150                                  ;function ------------------------------------------------------------ 
+   151                                  ;function for printing hex values   
+   152                                  print_xmm:
+   153 0000023C 55                      push rbp
+   154 0000023D 4889E5                  mov  rbp,rsp
+   155 00000240 48BF-                   	mov 	rdi, hex	;print 0x
+   155 00000242 [2800000000000000] 
+   156 0000024A E8(00000000)            	call 	printf
+   157 0000024F B908000000                  mov 	rcx,8
+   158                                  .loop:
+   159 00000254 4831FF                      xor 	rdi,rdi
+   160 00000257 408AB9[07000000]            mov 	dil,[xmm+rcx-1]
+   161 0000025E 51                          push 	rcx
+   162 0000025F 6A00                    	push 	0x0
+   163 00000261 E8(00000000)                call 	print_hex
+   164 00000266 4883C408                	add     rsp,8
+   165 0000026A 59                          pop 	rcx
+   166 0000026B E2E7                        loop .loop   
+   167 0000026D C9                      leave
+   168 0000026E C3                      ret
