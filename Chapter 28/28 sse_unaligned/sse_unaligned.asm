@@ -1,4 +1,5 @@
 ; sse_unaligned.asm
+BITS 64:
 extern printf
 section .data
 ;single precision							
@@ -67,7 +68,6 @@ mov	rbp,rsp
     	mov 		rsi,dpvector_res
     	mov 		rdi,fmt6
     	call 	printdpfp
-
 leave	
 ret
 

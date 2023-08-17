@@ -32,9 +32,9 @@ section .bss
 section .text							
 	global main					
 main:
-mov 	rbp, rsp; for correct debugging
-push 	rbp
-mov 	rbp,rsp
+	mov 	rbp, rsp; for correct debugging
+	push 	rbp
+	mov 	rbp,rsp
 
 ;division
 ;default mxcsr
@@ -50,14 +50,14 @@ mov 	rbp,rsp
 	mov 	rsi,ten
 	mov 	rdx,three
 	mov 	ecx, [default_mxcsr]
-	call apply_mxcsr
+	call 	apply_mxcsr
 ;divide by zero
 ;default mxcsr
 	mov 	rdi,fmt2
 	mov 	rsi,ten
 	mov 	rdx,zero
 	mov 	ecx, [default_mxcsr]
-	call apply_mxcsr
+	call 	apply_mxcsr
 ;division with precision error
 ;round up
 	mov 	rdi,fmt4
