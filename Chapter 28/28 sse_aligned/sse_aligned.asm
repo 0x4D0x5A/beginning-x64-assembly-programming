@@ -1,4 +1,5 @@
 ; sse_aligned.asm
+BITS 64:
 extern printf
 section .data
 	dummy   db      13
