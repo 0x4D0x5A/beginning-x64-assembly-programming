@@ -30,14 +30,14 @@ ret
 pstrlen:
 push	rbp		
 mov	rbp,rsp
-    	mov	rax,		-16		; avoid changing ZF later	 
-	pxor	xmm0, 	xmm0		; 0 (end of string)
+    mov		rax, -16		; avoid changing ZF later	 
+	pxor	xmm0, xmm0		; 0 (end of string)
 .not_found:	
-	add        	rax, 16	; avoid changing ZF later
+	add        	rax, 16		; avoid changing ZF later
                            	; after pcmpistri
-	pcmpistri		xmm0, [rdi + rax], 00001000b 	;'equal each'
-	jnz        	.not_found           	; 0 found?
-	add			rax, rcx		; rcx contains the index of the 0
+	pcmpistri	xmm0, [rdi + rax], 00001000b 	;'equal each'
+	jnz        	.not_found  ; 0 found?
+	add			rax, rcx	; rcx contains the index of the 0
 	inc			rax			; correct for index 0 at start
 leave
 ret
