@@ -2,24 +2,30 @@
 ; compare strings explicit length
 extern printf
 section .data					    
-	string1	db	"the quick brown fox jumps over the "
-			db	"lazy river" 
+	string1	    db	"the quick brown fox jumps over the "
+			    db	"lazy river" 
+
 	string1Len equ $ - string1
-	string2	db	"the quick brown fox jumps over the "
-			db	"lazy river"
+
+	string2	    db	"the quick brown fox jumps over the "
+			    db	"lazy river"
+
 	string2Len equ $ - string2 
-	dummy	db "confuse the world"       
-	string3   db	"the quick brown fox jumps over the " 
-			db	"lazy dog"     
+
+	dummy	    db "confuse the world"       
+
+	string3     db	"the quick brown fox jumps over the " 
+			    db	"lazy dog"     
+
 	string3Len  equ $ - string3  
              
-	fmt1 	db "Strings 1 and 2 are equal.",10,0
+	fmt1 	    db "Strings 1 and 2 are equal.",10,0
 	fmt11   	db "Strings 1 and 2 differ at position %i.",10,0               
-	fmt2 	db "Strings 2 and 3 are equal.",10,0
+	fmt2 	    db "Strings 2 and 3 are equal.",10,0
 	fmt22   	db "Strings 2 and 3 differ at position %i.",10,0   
  
 section .bss
-        buffer resb 64
+    buffer      resb 64
 section .text							
 	global main					
 main:
@@ -66,7 +72,7 @@ mov	rbp,rsp
     pop 	rax     ;recall the return value      
     mov 	rdi,fmt1
     cmp 	rax,0
-    je 	eql1
+    je 	    eql1
     mov 	rdi,fmt11
  eql1:
     mov 	rsi, rax
@@ -102,7 +108,7 @@ mov	rbp,rsp
     pop 	rax     		; recall the return value               
     mov 	rdi,fmt2
     cmp 	rax,0
-    je 	eql2
+    je 	    eql2
     mov 	rdi,fmt22
  eql2:
     mov 	rsi, rax
@@ -132,12 +138,12 @@ mov	rbp,rsp
 	jmp     	.loop
 
 .differ:
-    	mov 	rax,rbx         
-    	add 	rax,rcx			; rcx contains the differing position
-    	inc 	rax                 ; because the counter starts at 0
-    	jmp 	exit
+    mov 	rax,rbx         
+    add 	rax,rcx			; rcx contains the differing position
+    inc 	rax                 ; because the counter starts at 0
+    jmp 	exit
 .equal: 
-    	xor 	rax,rax
+    xor 	rax,rax
 exit:
-leave
-ret
+    leave
+    ret
